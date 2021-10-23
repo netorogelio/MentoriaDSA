@@ -1,0 +1,402 @@
+---
+title: "Análise da criminalidade no estado de São Paulo relacionada a População, Educação e Renda"
+#author: "Rogelio Neto "
+date: "`r format(Sys.time(), '%d %B, %Y')` "
+output:
+  html_document:
+    highlight: textmate
+    includes:
+      in_header: cabecalho.html
+    theme: flatly
+# flatly "default", "cerulean", "journal", "flatly", "darkly", "readable", "spacelab", 
+# "united", "cosmo", "lumen", "paper", "sandstone", "simplex", "yeti"
+    number_sections: yes
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: no
+  pdf_document:
+    toc: yes
+---
+```{r Pacotes, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(readxl)
+library(sqldf)
+#library(pacman)
+library(dplyr)
+library(plotly)
+library(ggplot2)
+library(plotrix)
+#library(plotrix)
+ 
+#library(dplyr)                                
+#library(car)                                
+#library(rstatix)                                
+#library(emmeans)
+#library(ggplot2)
+#library(knitr)
+#library(htmltools)
+#library(readr)
+
+```
+---
+# Introdução
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+PROGRAMA DE MENTORIA ENTRE ALUNOS DSA - TURMA 2 - TEMPORADA 2021  
+
+## Composição da equipe
+
+Nome | e_mail | Função
+:-------------------------- | :---------------------------------| :------------
+Rogélio Gonçalves Neto | rogelio.neto@uspedra.com.br | Mentor
+Luciana Silva Albuquerque de Melo	| lucianasmf@yahoo.com.br | Mentorado
+Leticia Fiorina Echeverria Grobério |	lele1806@bol.com.br | Mentorado
+
+## Resumo
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Para este Programa de Mentoria nossa equipe trabalhou em um projeto que teve como objetivo geral analisar de conjuntos de dados públicos sobre população, educação, renda e criminalidade no Estado de São Paulo a fim de encontrar possíveis correlações que possam corroborar com a tomada de decisão e planejamento estratégico por parte da Segurança Pública do Estado de São Paulo, visto a necessidade de maior agilidade no enfrentamento da criminalidade.  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A fim de alcançar o objetivo principal do projeto a equipe seguiu alguns passos que estão listados como objetivos específicos e que propiciou atender, na medida do possível, o objetivo do Programa de Mentoria entre alunos DSA – Temporada - 2021, que é: “Permitir que alunos mais experientes e com perfil de Mentor, ajudem outros alunos indicando caminhos para os objetivos profissionais, guias de estudos, desenvolvimento de soft skills e trabalho em grupo” (DSA,2021).  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Os conjuntos de dados foram extraídos por meio do desenvolvimento de um método automático e apresentados em um dashboard desenvolvido em Power BI.  
+
+
+## Objetivo do trabalho
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Este trabalho tem como objetivo geral a análise de conjuntos de dados públicos sobre população, educação, renda e criminalidade no Estado de São Paulo a fim de encontrar possíveis correlações que possam corroborar com a tomada de decisão e planejamento estratégico por parte da Segurança Pública do Estado de São Paulo e tem como objetivos específicos:  
+
+* Trabalhar com o ciclo de vida de ciência de dados;  
+* Extrair os quatro datasets propostos;  
+* Demonstrar os dados dos datasets extraídos;  
+* Apresentar um dashboard das informações;  
+* Apresentar um arquivo consolidado das informações;  
+
+## Macro cronograma
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Apresentação do macro cronograma do projeto, não foi possível realizao detalhamento do cronograma devido ao tempo. Período do projeto de 07/06/2021	à 30/09/2021.
+
+Data Início | Dias | Atividades | Data Fim
+:------------ | :------ | :---------------------------- | :------------
+07/06/2021 | 20 | Definição do tema; | 27/06/2021
+ - | -  | Definição das atividades;	| -
+ - | -  | Definição do problema; | -
+28/06/2021 | 15 | Identificação do site | 13/07/2021
+- | -  | Identificação das ferramentas | -
+14/07/2021 | 15 | Problemas pessoais (quase desistência do projeto) | 29/07/2021
+30/07/2021 | 46 | Desenvolvimento dos robôs; | 14/09/2021
+- | -  | Análise dos dataset; | -
+- | -  | Desenvolvimento do RMarkdown | -
+- | -  | Desenvolvimento do PowerBI | -
+15/09/2021 | 15 | Desenvolvimento da documentação; | 30/09/2021
+01/10/2021 |  3	| Revisão da entrega; | 04/10/2021
+- | -  | Entrega do trabalho; | -
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Tendo em vista que trata-se de um trabalho acadêmico sem fins profissionais os dados baixados não foram extraídos em sua totalidade e em alguns sites haviam dados faltantes, ou seja, não estavam atualizados com todos os anos, desta forma foi **definido que não iríamos nos preocupar com estes dados faltantes** e sim com os processos de automatização **“criação dos robôs”**, desenvolvimento de uma visualização de entregra e finalizando com o gráficos de demonstração de resultados.
+
+# Apresentação dos dados e informações
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Os datasets (ou conjuntos de dados) são os insumo dos processos de análise de dados, representam os dados extraídos de um fonte origem site, sistema, redes sociais e etc. O que foi utilizado neste projeto foram de orgãos publicos do Brasil e do estado de São Paulo.  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Em todos os datasets os nomes dos municipíos foram tratados e transformado em caixa alta, retirada a acentuação e realizado acertos diversos.
+
+## Origem fonte de dados
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Suas origens serão descritas no quadro a seguir.
+
+Nome | Descritivo | Site Extração
+:--------------- | :----------------------------- | :----------------------------
+POP_MUNICIPIO.xlsx | População, divida por Sexo | https://repositorio.seade.gov.br/dataset/populacao-por-municipio-sexo-e-idade
+PIB_MUNICIPIO.xlsx | Renda percapita, dividida por area de negócio |http://repositorio.seade.gov.br/dataset/pib-municipal-2002-2018
+OCOR_MUNICIPIO.xlsx | Ocorrências policiais, dividida por tipo de ocorrência | https://www.ssp.sp.gov.br/Estatistica/Pesquisa.aspx
+ESCOLA_MUNICIPIO.xlsx | Escolaridade, dvidida por serie | http://www.educacao.sp.gov.br/central-de-atendimento/downloads.asp
+
+
+```{r leituraDados, echo=FALSE}
+# Observações:
+# Foram realiados ajustes nas colunas, entendemos que deveria ter realizado no processo de extração. Como não foi ajustamos na geração mesma.
+# ===========================================================================================================
+popul <- read_excel("C://Mentoria//Final//POP_MUNICIPIO.xlsx", sheet=1, col_names=TRUE)
+
+renda <- read_excel("C://Mentoria//Final//PIB_MUNICIPIO.xlsx", sheet=1, col_names=TRUE)
+colnames(renda)[3] <- "Municipio"
+colnames(renda)[5] <- "Agropecuaria"
+colnames(renda)[6] <- "Industria"
+colnames(renda)[7] <- "AdmPublica"
+colnames(renda)[8] <- "TotalGeral"
+colnames(renda)[9] <- "PIB"
+colnames(renda)[10] <- "PibPerCapita"
+
+ocorr <- read_excel("C://Mentoria//Final//OCOR_MUNICIPIO.xlsx", sheet=1, col_names=TRUE)
+colnames(ocorr)[4] <- "PorteEntorpecente"
+colnames(ocorr)[5] <- "TraficoEntorpecente"
+colnames(ocorr)[6] <- "ApreensaoEntorpecente"
+colnames(ocorr)[7] <- "PorteIlegalArma"
+colnames(ocorr)[8] <- "ArmasFogoApreendids"
+colnames(ocorr)[9] <- "FlagantesLavrados"
+colnames(ocorr)[10] <- "ApreendidosFragante"
+colnames(ocorr)[11] <- "ApreendidosMandado"
+colnames(ocorr)[12] <- "PresasFlagrante"	
+colnames(ocorr)[13] <- "PresasMandado"
+colnames(ocorr)[14] <- "PrisoesEfetuadas"
+colnames(ocorr)[15] <- "VeiculosRecuperados"
+colnames(ocorr)[16] <- "InqueritosPoliciais"
+colnames(ocorr)[17] <- "Total"
+
+escol <- read_excel("C://Mentoria//Final//ESCOLA_MUNICIPIO.xlsx", sheet=1, col_names=TRUE)
+colnames(escol)[5] <- "Fund_1"
+colnames(escol)[6] <- "Fund_2"
+colnames(escol)[7] <- "Fund_3"
+colnames(escol)[8] <- "Fund_4"
+colnames(escol)[9] <- "Fund_5"
+colnames(escol)[10] <- "Fund_6"
+colnames(escol)[11] <- "Fund_7"
+colnames(escol)[12] <- "Fund_8"
+colnames(escol)[13] <- "Fund_9"
+colnames(escol)[14] <- "Med_1"
+colnames(escol)[15] <- "Med_2"
+colnames(escol)[16] <- "Med_3"
+
+```
+
+## Apresentações dos **Datasets**
+
+### Informação da **População**  
+```{r qtdDadoPopul, echo=FALSE}
+## Realiza os acumulados para apresentação das informações
+q_popul <- popul %>%
+  summarise(n_ano = min(ano),
+            t_mulher = sum(mulher),
+            t_homem = sum(homem),
+            t_total = sum(mulher+homem))
+```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Informações do ano de `r q_popul$n_ano` do Estado de São Paulo possui `r nrow(popul)` municípios, com um total de `r toString(q_popul$t_mulher)` mulheres e `r toString(q_popul$t_homem)` homens, totalizando `r toString(q_popul$t_total)` pessoas.
+
+```{r GrafPopul, echo=FALSE}
+fatias = c(q_popul$t_mulher, q_popul$t_homem)
+grafPopul = c("Mulher", "Homem")
+grafPopul = paste(grafPopul, fatias)
+pie3D(fatias, labels = grafPopul, explode = 0.05, 
+      col = c("steelblue1", "lemonchiffon4"), 
+      main = "Total da população")
+```
+
+```{r tabelaPopul, echo=FALSE}
+tabPopul <- data.frame(popul$municipio,popul$mulher,popul$homem,(popul$mulher+popul$homem))
+tabPopul %>% 
+  DT::datatable(colnames = c('Município','Mulher','Homem', 'Total'))
+```
+
+### Informação da **Renda** 
+```{r qtdDadoRenda, echo=FALSE}
+## Realiza os acumulados para apresentação das informações
+q_renda <- renda %>%
+  summarise(n_ano = min(renda$ano),
+            t_agropecuaria = sum(renda$Agropecuaria),
+            t_industria = sum(renda$Industria),
+            t_admpublica = sum(renda$AdmPublica),
+            t_total = sum(renda$TotalGeral),
+            t_pib = mean(renda$PIB),
+            t_percapita = mean(renda$PibPerCapita)
+            )
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Informações do ano de `r q_renda$n_ano` do Estado de São Paulo possui `r nrow(renda)` municípios, com uma renda total de `r toString(q_renda$t_total)`, distribuída nas áreas da seguinte forma. Em Agropecuária `r toString(q_renda$t_agropecuaria)`, industria `r toString(q_renda$t_industria)` e administração pública `r toString(q_renda$t_admpublica)`. Gerando um PIB médio `r toString(q_renda$t_pib)` com uma renda per capita média `r toString(q_renda$t_percapita)`.
+
+```{r GrafRenda, echo=FALSE}
+fatias = c(q_renda$t_agropecuaria, q_renda$t_industria, q_renda$t_admpublica)
+grafRenda = c("Agropecuária", "Indústria", "Adm.Pública")
+grafRenda = paste(grafRenda, fatias)
+pie3D(fatias, labels = grafRenda, explode = 0.05,
+      col = c("steelblue1", "lemonchiffon4", "tan3"), 
+      main = "Distribuição da renda por área")
+```
+
+```{r tabelaRenda, echo=FALSE}
+tabRenda <- data.frame(renda$Municipio,
+                       renda$Agropecuaria,
+                       renda$Industria,
+                       renda$AdmPublica,
+                       (renda$Agropecuaria+renda$Industria+renda$AdmPublica),
+                       renda$PIB, 
+                       renda$PibPerCapita)
+tabRenda %>% 
+  DT::datatable(colnames = c('Município',
+                             'Agropecuária',
+                             'Indústria', 
+                             'Adm.Pública', 
+                             'Total', 
+                             'PIB', 
+                             'Per Capita'))
+```
+
+### Informação das **Ocorrências Policiais**  
+```{r qtdDadoOcorr, echo=FALSE}
+## Realiza os acumulados para apresentação das informações
+q_ocorr <- ocorr %>%
+  summarise(n_ano = min(ocorr$Ano),
+            t_PorteEntorpecente = sum(ocorr$PorteEntorpecente),
+            t_TraficoEntorpecente = sum(ocorr$TraficoEntorpecente),
+            t_ApreensaoEntorpecente = sum(ocorr$ApreensaoEntorpecente),
+            t_PorteIlegalArma = sum(ocorr$PorteIlegalArma),
+            t_ArmasFogoApreendids = sum(ocorr$ArmasFogoApreendids),
+            t_FlagantesLavrados = sum(ocorr$FlagantesLavrados),
+            t_ApreendidosFragante = sum(ocorr$ApreendidosFragante),
+            t_ApreendidosMandado = sum(ocorr$ApreendidosMandado),
+            t_PresasFlagrante = sum(ocorr$PresasFlagrante),	
+            t_PresasMandado = sum(ocorr$PresasMandado),
+            t_PrisoesEfetuadas = sum(ocorr$PrisoesEfetuadas),
+            t_VeiculosRecuperados = sum(ocorr$VeiculosRecuperados),
+            t_InqueritosPoliciais = sum(ocorr$InqueritosPoliciais),
+            t_Total = sum(ocorr$Total),
+            t_Entorpecente = sum(ocorr$PorteEntorpecente + ocorr$TraficoEntorpecente +
+                                   ocorr$ApreensaoEntorpecente),
+            t_Arma = sum(ocorr$PorteIlegalArma+ocorr$ArmasFogoApreendids),
+            t_Apreensao = sum(ocorr$FlagantesLavrados + 
+                                ocorr$ApreendidosFragante +
+                                ocorr$ApreendidosMandado),
+            t_Presas = sum(ocorr$PresasFlagrante + ocorr$PresasMandado +
+                             ocorr$PrisoesEfetuadas),
+            t_agr_ocorr = sum(ocorr$PorteEntorpecente + 
+                                ocorr$TraficoEntorpecente + 
+                                ocorr$ApreensaoEntorpecente +
+                                ocorr$PorteIlegalArma +
+                                ocorr$ArmasFogoApreendids + 
+                                ocorr$FlagantesLavrados + 
+                                ocorr$ApreendidosFragante +
+                                ocorr$ApreendidosMandado + 
+                                ocorr$PresasFlagrante + 
+                                ocorr$PresasMandado +
+                                ocorr$PrisoesEfetuadas))
+```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Informações do ano de `r q_ocorr$n_ano` do Estado de São Paulo, agrupamento as ocorrências por Entorpecentes `r toString(q_ocorr$t_Entorpecente)`, Armas `r toString(q_ocorr$t_Arma)`, Apreensão `r toString(q_ocorr$t_Apreensao)` e Prisões `r toString(q_ocorr$t_Presas)` totalizando um total de `r toString(q_ocorr$t_agr_ocorr)`. Também houve uma recuperação de veículos de `r toString(q_ocorr$t_VeiculosRecuperados)`. 
+
+```{r GrafResOcorr, echo=FALSE}
+fatias = c(q_ocorr$t_Entorpecente,
+           q_ocorr$t_Arma,
+           q_ocorr$t_Apreensao,
+           q_ocorr$t_Presas
+           )
+grafResOcorr = c("Entorpecente", "Armas",
+                 "Apreensões",
+                 "Prisões")
+grafResOcorr = paste(grafResOcorr, fatias)
+pie(fatias, labels = grafResOcorr, 
+#   col = c("steelblue1", "lemonchiffon4", "tan3"), 
+    main = "Distribuição das ocorrências policiais")
+
+#pie3D(fatias, labels = grafResOcorr, explode = 0.05,
+#      col = c("steelblue1", "lemonchiffon4", "tan3"), 
+#      main = "Agrupamento das ocorrências policiais")
+```
+
+
+```{r GrafOcorr, echo=FALSE}
+# Observação:
+# Este crafico não foi constrido pois a visualização não ficou boa, teria que ser construido com grafico de #barras e até o momento não consegui realizar o estudo para entrega.
+fatias = c(q_ocorr$t_PorteEntorpecente,
+           q_ocorr$t_TraficoEntorpecente,
+           q_ocorr$t_ApreensaoEntorpecente,
+           q_ocorr$t_PorteIlegalArma,
+           q_ocorr$t_ArmasFogoApreendids,
+           q_ocorr$t_FlagantesLavrados,
+           q_ocorr$t_ApreendidosFragante,
+           q_ocorr$t_ApreendidosMandado,
+           q_ocorr$t_PresasFlagrante,
+           q_ocorr$t_PresasMandado,
+           q_ocorr$t_PrisoesEfetuadas,
+           q_ocorr$t_VeiculosRecuperados,
+           q_ocorr$t_InqueritosPoliciais)
+grafOcorr = c("Porte Entorpecente", "Trafico Entorpecente", "Apreensao Entorpecente",
+              "PorteIlegalArma","ArmasFogoApreendids","FlagantesLavrados",
+              "ApreendidosFragante","ApreendidosMandado","PresasFlagrante",
+              "PresasMandado","PrisoesEfetuadas","VeiculosRecuperados",
+              "InqueritosPoliciais")
+grafOcorr = paste(grafOcorr, fatias)
+#pie(fatias, labels = grafOcorr, 
+#   col = c("steelblue1", "lemonchiffon4", "tan3"), 
+#    main = "Distribuição das ocorrências policiais")
+
+# Observação
+# Não foi utilizado pelo fato da visualização ficar ruim.
+# =======================================================
+#pie3D(fatias, labels = grafOcorr, explode = 0.05,
+#      col = c("steelblue1", "lemonchiffon4", "tan3"), 
+#      main = "Distribuição das ocorrências policiais")
+
+```
+
+```{r tabelaOcorr, echo=FALSE}
+tabOcorr <- data.frame(ocorr$Municipio,
+                       (ocorr$PorteEntorpecente + ocorr$TraficoEntorpecente +ocorr$ApreensaoEntorpecente),
+                       (ocorr$PorteIlegalArma+ocorr$ArmasFogoApreendids),
+                       (ocorr$FlagantesLavrados + ocorr$ApreendidosFragante + ocorr$ApreendidosMandado),
+                       (ocorr$PresasFlagrante + ocorr$PresasMandado + ocorr$PrisoesEfetuadas),
+                       (ocorr$PorteEntorpecente + ocorr$TraficoEntorpecente + ocorr$ApreensaoEntorpecente +
+                          ocorr$PorteIlegalArma + ocorr$ArmasFogoApreendids + ocorr$FlagantesLavrados + 
+                          ocorr$ApreendidosFragante + ocorr$ApreendidosMandado + ocorr$PresasFlagrante + 
+                          ocorr$PresasMandado + ocorr$PrisoesEfetuadas))
+tabRenda %>% 
+  DT::datatable(colnames = c("Município", "Entorpecente", "Armas","Apreensões","Prisões", "Total"))
+```
+
+
+### Informação da **Escolaridade** 
+
+```{r qtdDadoEscol, echo=FALSE}
+## Realiza os acumulados para apresentação das informações
+q_escol <- escol %>%
+  summarise(n_ano = min(Ano),
+            t_pre = sum(escol$Pre),
+            t_fund = sum(escol$Fund_1+escol$Fund_2+escol$Fund_3+escol$Fund_4+
+                      escol$Fund_5+escol$Fund_6+escol$Fund_7+escol$Fund_8+
+                      escol$Fund_9),
+            t_medio = sum(escol$Med_1+escol$Med_2+escol$Med_3),
+            t_total = sum(escol$Pre +
+                            escol$Fund_1+escol$Fund_2+escol$Fund_3+escol$Fund_4+
+                            escol$Fund_5+escol$Fund_6+escol$Fund_7+escol$Fund_8+
+                            escol$Fund_9+escol$Med_1+escol$Med_2+escol$Med_3)
+            )
+```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Informações do ano de `r q_escol$n_ano` do Estado de São Paulo possui `r nrow(escol)` municípios, com um total de `r toString(q_escol$t_pre)` alunos pré escola, `r toString(q_escol$t_fund)` ensino fundamental, `r toString(q_escol$t_medio)` ensino fundamental e totalizando `r toString(q_escol$t_total)` de alunos matriculados.
+
+```{r GrafEscol, echo=FALSE}
+q_escol <- escol %>%
+  summarise(t_Pre = sum(Pre),
+            t_Fund = sum(Fund_1+Fund_2+Fund_3+Fund_4+Fund_5+Fund_6+Fund_7+Fund_8+Fund_9),
+            t_medio = sum(Med_1+Med_2+Med_3))
+
+fatias = c(q_escol$t_Pre, q_escol$t_Fund, q_escol$t_medio)
+grafEscol = c("Pre-Escola", "Fundamental", "Médio")
+grafEscol = paste(grafEscol, fatias)
+pie(fatias, labels = grafEscol, 
+#   col = c("steelblue1", "lemonchiffon4", "tan3"), 
+    main = "Total da alunos por tipo de ensino")
+
+# Observação:
+# Retirado pois estava sobrepondo as fatias e não houve tempo de pesquisa para identificar o problema.
+# ====================================================================================================
+#pie3D(fatias, labels = grafEscol, explode = 0.05,
+#      col = c("steelblue1", "lemonchiffon4", "tan3"), 
+#      main = "Total da alunos por tipo de ensino")
+```
+
+```{r tabelaEscol, echo=FALSE}
+tabEscol <- data.frame(escol$Municipio,escol$Pre,
+                     (escol$Fund_1+escol$Fund_2+escol$Fund_3+escol$Fund_4+
+                      escol$Fund_5+escol$Fund_6+escol$Fund_7+escol$Fund_8+
+                      escol$Fund_9), (escol$Med_1+escol$Med_2+escol$Med_3))
+tabEscol %>% 
+  DT::datatable(colnames = c('Município.','Pre-Escola','Fundamental', 'Médio') )
+```
